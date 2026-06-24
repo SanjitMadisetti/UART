@@ -21,3 +21,10 @@ The state machine of the controller forms the following output signals that cont
 *shift* : directs *XMT_shftreg* to shift by one bit towards the LSB and to backfill with a stop bit (1).
                                                                                                                                                                                                                                                                                                             
 *clear* : clears *bit_count*                                                                                                                                                                                                                                                                                                            
+The machine has three states: *idle*, *waiting* and *sending*. When the active-low synchronous reset signal *rst_b* is asserted, the machine enters *idle*, *bit_count* is flushed and *XMT_shftreg* is loaded with 1s. In *idle*, if an active edge of *Clock* occurs while *Load_XMT_data_reg* is asserted by the external host, the output signal *Load_XMT_DR* will load *XMT_data_reg* with the contents of *Data_Bus*. The machine remains in *idle* until *start* is asserted to drop *XMT_shftreg[0]*.
+
+When *Byte_ready* is asserted (with *rst_b* and *Load_XMT_datareg* de-asserted), *Load_XMT_shftreg* is asserted and *next_state* is driven to *waiting*. The assertion of *Load_XMT_shftreg* indicates that *XMT_datareg* now contains data that can be transferred to the internal shift register. At the next active edge of *Clock*, with *Load_XMT_shftreg* asserted, three activities occur:
+(1) *state* transfers from *idle* to *waiting*
+(2) the contents of *XMT_datareg* are loaded into the leftmost bits of *XMT_shftreg* a (*word_size*+1)-bit shift register whose LSB signals the start and stop of transmission
+(3) the LSB of *XMT_shftreg* is reloaded with 1, the stop-bit. 
+The machine remains in *waiting* until the external host processor asserts *T_byte*. 

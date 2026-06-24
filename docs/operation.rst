@@ -1,0 +1,3 @@
+The UART transmitter is always part of a larger environment in which a host processor controls transmission by fetching a data word in parallel format and directing the UART to transmit it in a serial format. the receiver must detect transmission, receive the data in serial format, strip off the start and stop bits and store the data word in a parallel format.
+
+The receiver's job is more complex, because the clock used to send the inbound data is not available at the remote receiver - data arrives at the receiver asynchronously. The receiver must regenerate the clock locally to synchronize the sampling of inbound data using the receiving machine's clock rather than the clock of the transmitting machine.

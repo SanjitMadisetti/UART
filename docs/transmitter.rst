@@ -28,3 +28,6 @@ When *Byte_ready* is asserted (with *rst_b* and *Load_XMT_datareg* de-asserted),
 (2) the contents of *XMT_datareg* are loaded into the leftmost bits of *XMT_shftreg* a (*word_size*+1)-bit shift register whose LSB signals the start and stop of transmission
 (3) the LSB of *XMT_shftreg* is reloaded with 1, the stop-bit. 
 The machine remains in *waiting* until the external host processor asserts *T_byte*. 
+
+At the next active edge of *Clock*, with *T_byte* asserted, *state* enters *sending* and the LSB *XMT_shftreg* is set to 0 to signal the start of transmission. At the same time, *shift* driven to 1 and *next_state* retains the state code corresponding to *sending*. At subsequent active edges of *Clock*, with *shift* asserted, *state* remains in *sending* and the contents of *XMT_shftreg* are shifted toward LSB which drives the external serial channel. As the data shifts occur, 1s are back-filled in *XMT_shftreg* and *bit_count* is incremented. With *state* in *sending*, *shift* asserts whicle *bit_count* is less than 9, i.e. while *BC_lt_BCmax* is asserted. The machine increments *bit_count* after each movement of data and when *bit_count* reaches 9 (*BC_lt_BCmax* is 0) *clear* asserts indicating that all of the bits of the augmented word have been shifted to the serial output. At the next active edge of *Clock* the machine returns to *idle*. 
+
